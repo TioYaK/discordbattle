@@ -1,0 +1,39 @@
+# Dependências
+node_modules/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Sessões WhatsApp (Puppeteer)
+.wwebjs_auth/
+.wwebjs_auth_fallback/
+.wwebjs_auth_fallback_*/
+
+# Banco de dados e dados sensíveis
+data/*.db
+data/*.db-*
+data/qr.png
+data/pending_registrations.json
+
+# Cache de scraping (opcional — regenerável)
+data/cache_*.json
+
+# Logs e PM2
+logs/
+*.log
+
+# Config local (opcional — descomente se não quiser versionar)
+# bot.config.json
+
+# SO / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Scratch / debug
+scratch/

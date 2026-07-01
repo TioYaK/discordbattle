@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascended RPG — Painel do Reino</title>
+    <meta name="description" content="Painel em tempo real do RPG Ascended — Rankings, Pets, Missões e Estatísticas do servidor.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="glass-panel main-header">
+            <div class="logo">
+                <span class="logo-icon">⚔️</span>
+                <div>
+                    <h1>Ascended <span class="highlight">RPG</span></h1>
+                    <p class="logo-sub">Painel do Reino — Atualizado em tempo real</p>
+                </div>
+            </div>
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                AO VIVO
+            </div>
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <span class="stat-icon">👥</span>
+                    <div>
+                        <span class="stat-label">Heróis Registrados</span>
+                        <span class="stat-value" id="totalPlayers">--</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📅</span>
+                    <div>
+                        <span class="stat-label">Ciclo de Taxa</span>
+                        <span class="stat-value" id="currentCycle">--</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Live Events (Boss / Invasion Ticker) -->
+        <section id="live-events" class="glass-panel live-events-widget hidden">
+            <div class="events-container" id="eventsContainer">
+                <!-- Will be dynamically populated -->
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-nav glass-panel">
+            <button class="tab-btn active" data-tab="ranking">🏆 Ranking</button>
+            <button class="tab-btn" data-tab="pets">🐾 Companheiros</button>
+            <button class="tab-btn" data-tab="quests">📜 Missões</button>
+            <button class="tab-btn" data-tab="guide">📖 Guia</button>
+        </nav>
+
+        <!-- Tab: Ranking -->
+        <section id="tab-ranking" class="tab-content active">
+            <div class="glass-panel leaderboard">
+                <div class="panel-header">
+                    <h2>🏆 Hall da Fama — Top 10</h2>
+                    <p>Os maiores guerreiros que já pisaram em Aethelgard</p>
+                </div>
+                <div class="leaderboard-list" id="leaderboardList">
+                    <div class="loading-state">⚔️ Invocando os campeões do reino...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Pets -->
+        <section id="tab-pets" class="tab-content">
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>🐾 Companheiros dos Campeões</h2>
+                    <p>Pets do Top 10 e seus Níveis de Evolução</p>
+                </div>
+                <div class="pet-grid" id="petGrid">
+                    <div class="loading-state">🥚 Chocando ovos...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Quests -->
+        <section id="tab-quests" class="tab-content">
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>📜 Missões Diárias — Sistema</h2>
+                    <p>As missões disponíveis na Taverna hoje</p>
+                </div>
+                <div class="quest-info">
+                    <div class="quest-type-card glass-small">
+                        <div class="qt-icon">⚔️</div>
+                        <div class="qt-info">
+                            <h3>Missão de Caça</h3>
+                            <p>Cace entre <strong>10–20 monstros</strong> usando <code>!cacar</code></p>
+                            <div class="qt-reward">Recompensa: <span>1.500–3.000 AC</span></div>
+                        </div>
+                    </div>
+                    <div class="quest-type-card glass-small">
+                        <div class="qt-icon">🗡️</div>
+                        <div class="qt-info">
+                            <h3>Missão de Duelo</h3>
+                            <p>Vença <strong>2–4 duelos</strong> de arena usando <code>!duelar</code></p>
+                            <div class="qt-reward">Recompensa: <span>600–1.200 AC</span></div>
+                        </div>
+                    </div>
+                    <div class="quest-type-card glass-small">
+                        <div class="qt-icon">💰</div>
+                        <div class="qt-info">
+                            <h3>Missão de Taxa</h3>
+                            <p>Pague a taxa do ciclo usando <code>!taxa enviar</code></p>
+                            <div class="qt-reward">Recompensa: <span>1.000 AC</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quest-tip glass-small">
+                    💡 <strong>Dica:</strong> Complete todas as 3 missões no mesmo dia para ganhar <strong>Bônus de Conclusão Total</strong>! Use <code>!taverna</code> no Discord para ver seu progresso.
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: Guide -->
+        <section id="tab-guide" class="tab-content">
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>📖 Guia Rápido do Aventureiro</h2>
+                    <p>Tudo que você precisa para dominar Aethelgard</p>
+                </div>
+                <div class="guide-grid">
+                    <div class="guide-card glass-small">
+                        <h3>🚀 Começando</h3>
+                        <ul>
+                            <li>Registre-se no Discord com <code>!registro</code></li>
+                            <li>Crie seu personagem RPG com <code>/rpg-registrar</code></li>
+                            <li>Escolha uma profissão que combina com seu estilo de jogo</li>
+                            <li>Use <code>!cacar</code> para começar a acumular XP e AC</li>
+                        </ul>
+                    </div>
+                    <div class="guide-card glass-small">
+                        <h3>⚔️ Comandos Principais</h3>
+                        <ul>
+                            <li><code>!cacar</code> — Caçar monstros (cooldown: 10min)</li>
+                            <li><code>!duelar @usuario</code> — Duelo 1v1 apostando AC</li>
+                            <li><code>!taverna</code> — Ver missões diárias</li>
+                            <li><code>!pets</code> — Gerenciar companheiros</li>
+                            <li><code>!perfil</code> — Ver sua ficha completa</li>
+                            <li><code>!loja</code> — Comprar equipamentos</li>
+                        </ul>
+                    </div>
+                    <div class="guide-card glass-small">
+                        <h3>🐾 Sistema de Pets</h3>
+                        <ul>
+                            <li>Compre Ovos na <code>!loja</code> e choque em <code>!pets</code></li>
+                            <li>Pets ganham XP a cada caçada feita com eles equipados</li>
+                            <li>Ao Nível 10, pets com evolução se transformam em criaturas mais poderosas</li>
+                            <li>Pets Lendários dão +20% em Dano e Defesa</li>
+                        </ul>
+                    </div>
+                    <div class="guide-card glass-small">
+                        <h3>🏰 Invasões e Masmorra</h3>
+                        <ul>
+                            <li>Participe de invasões em grupo com <code>!invasao</code></li>
+                            <li>Forme parties com <code>!party criar</code></li>
+                            <li>Entre na masmorra com a Chave (drop de caças) + <code>!masmorra</code></li>
+                            <li>Bosses de masmorra dropam recompensas únicas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Ascended RPG Dashboard • Atualizado a cada 30 segundos • <span id="lastUpdate">--</span></p>
+        </footer>
+    </div>
+
+    <!-- Modal: Ficha do Herói (Character Sheet) -->
+    <div id="characterModal" class="modal">
+        <div class="modal-content glass-panel">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div class="modal-body">
+                <div class="modal-header">
+                    <div class="hero-avatar" id="modalHeroAvatar">🛡️</div>
+                    <div class="hero-title-section">
+                        <h2 id="modalHeroName">Nome do Herói</h2>
+                        <div class="hero-meta">
+                            <span class="badge badge-vocation" id="modalHeroVocation">Classe</span>
+                            <span class="badge badge-profession" id="modalHeroProfession">Profissão</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-grid">
+                    <!-- Column 1: Stats and Equipment -->
+                    <div class="modal-col">
+                        <div class="glass-small card-block">
+                            <h3>📊 Atributos</h3>
+                            <div class="progress-container">
+                                <div class="progress-label">❤️ Vida (HP): <span id="modalHeroHp">100/100</span></div>
+                                <div class="progress-bar-bg"><div class="progress-bar hp-bar" id="modalHeroHpBar" style="width: 100%"></div></div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-label">✨ Nível / Experiência: <span id="modalHeroXp">Lvl 1 (0/100 XP)</span></div>
+                                <div class="progress-bar-bg"><div class="progress-bar xp-bar" id="modalHeroXpBar" style="width: 0%"></div></div>
+                            </div>
+                            <div class="stats-row">
+                                <div class="stat-mini">🪙 <span id="modalHeroCoins">0</span> AC</div>
+                                <div class="stat-mini">⚔️ <span id="modalHeroWins">0</span> Vitórias</div>
+                                <div class="stat-mini">💀 <span id="modalHeroLosses">0</span> Derrotas</div>
+                            </div>
+                        </div>
+
+                        <div class="glass-small card-block">
+                            <h3>🎒 Equipamento</h3>
+                            <div class="equip-grid">
+                                <div class="equip-slot" id="equip-weapon" data-slot="weapon">
+                                    <span class="slot-icon">🗡️</span>
+                                    <div class="slot-details">
+                                        <span class="slot-name">Arma</span>
+                                        <span class="slot-stats">Nenhum</span>
+                                    </div>
+                                </div>
+                                <div class="equip-slot" id="equip-shield" data-slot="shield">
+                                    <span class="slot-icon">🛡️</span>
+                                    <div class="slot-details">
+                                        <span class="slot-name">Escudo</span>
+                                        <span class="slot-stats">Nenhum</span>
+                                    </div>
+                                </div>
+                                <div class="equip-slot" id="equip-armor" data-slot="armor">
+                                    <span class="slot-icon">👕</span>
+                                    <div class="slot-details">
+                                        <span class="slot-name">Armadura</span>
+                                        <span class="slot-stats">Nenhum</span>
+                                    </div>
+                                </div>
+                                <div class="equip-slot" id="equip-amulet" data-slot="amulet">
+                                    <span class="slot-icon">📿</span>
+                                    <div class="slot-details">
+                                        <span class="slot-name">Amuleto</span>
+                                        <span class="slot-stats">Nenhum</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Pet and Quests -->
+                    <div class="modal-col">
+                        <div class="glass-small card-block">
+                            <h3>🐾 Companheiro (Pet)</h3>
+                            <div id="modalPetContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="glass-small card-block">
+                            <h3>📜 Missões da Taverna (Hoje)</h3>
+                            <div class="modal-quests-list" id="modalQuestsContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
