@@ -997,41 +997,43 @@ async function checkExpiredClaims() {
         console.log(`[Scheduler] Encontrados ${expiredClaims.length} claims expirados. Processando...`);
 
         for (const claim of expiredClaims) {
-            // Delete expired claim
-            db.deleteClaim(claim.respawn_id);
+            await guildLocalStorage.run({ guildId: claim.guild_id }, async () => {
+                // Delete expired claim
+                db.deleteClaim(claim.respawn_id);
 
-            // Se o claim expirado era ativo, avisa que o tempo acabou
-            if (claim.status === 'active') {
-                const expireMsg = `⏰ **Reserva Expirada:** O seu tempo de reserva do respawn **${claim.respawn_name}** (\`${claim.respawn_id}\`) terminou.`;
-                try {
-                    const user = await client.users.fetch(claim.player_id);
-                    if (user) await user.send(expireMsg);
-                } catch {}
-                try {
-                    const reg = db.getRegisteredMember(claim.player_id);
-                    if (reg && reg.phone) {
-                        const whatsapp = require('./whatsapp');
-                        await whatsapp.sendWhatsAppMessage(reg.phone, expireMsg);
-                    }
-                } catch {}
-            } else if (claim.status === 'pending') {
-                // Se era pendente, avisa que o prazo de aceitação de 10 min expirou
-                const expireMsg = `⏰ **Tempo de Aceitação Expirado:** Você não aceitou a reserva do respawn **${claim.respawn_name}** (\`${claim.respawn_id}\`) dentro do prazo de 10 minutos, portanto perdeu a sua vez.`;
-                try {
-                    const user = await client.users.fetch(claim.player_id);
-                    if (user) await user.send(expireMsg);
-                } catch {}
-                try {
-                    const reg = db.getRegisteredMember(claim.player_id);
-                    if (reg && reg.phone) {
-                        const whatsapp = require('./whatsapp');
-                        await whatsapp.sendWhatsAppMessage(reg.phone, expireMsg);
-                    }
-                } catch {}
-            }
+                // Se o claim expirado era ativo, avisa que o tempo acabou
+                if (claim.status === 'active') {
+                    const expireMsg = `⏰ **Reserva Expirada:** O seu tempo de reserva do respawn **${claim.respawn_name}** (\`${claim.respawn_id}\`) terminou.`;
+                    try {
+                        const user = await client.users.fetch(claim.player_id);
+                        if (user) await user.send(expireMsg);
+                    } catch {}
+                    try {
+                        const reg = db.getRegisteredMember(claim.player_id);
+                        if (reg && reg.phone) {
+                            const whatsapp = require('./whatsapp');
+                            await whatsapp.sendWhatsAppMessage(reg.phone, expireMsg);
+                        }
+                    } catch {}
+                } else if (claim.status === 'pending') {
+                    // Se era pendente, avisa que o prazo de aceitação de 10 min expirou
+                    const expireMsg = `⏰ **Tempo de Aceitação Expirado:** Você não aceitou a reserva do respawn **${claim.respawn_name}** (\`${claim.respawn_id}\`) dentro do prazo de 10 minutos, portanto perdeu a sua vez.`;
+                    try {
+                        const user = await client.users.fetch(claim.player_id);
+                        if (user) await user.send(expireMsg);
+                    } catch {}
+                    try {
+                        const reg = db.getRegisteredMember(claim.player_id);
+                        if (reg && reg.phone) {
+                            const whatsapp = require('./whatsapp');
+                            await whatsapp.sendWhatsAppMessage(reg.phone, expireMsg);
+                        }
+                    } catch {}
+                }
 
-            // Promove o próximo da fila
-            await promoteNextInQueue(claim.respawn_id, claim.respawn_name, claim.category);
+                // Promove o próximo da fila
+                await promoteNextInQueue(claim.respawn_id, claim.respawn_name, claim.category);
+            });
         }
 
         await runAllGuilds(async () => {
@@ -1048,43 +1050,49 @@ async function checkVoiceChannelPenalties() {
         const now = Date.now();
         const penaltyTime = 5 * 60 * 1000; // 5 minutos
 
-        for (const [userId, leftTime] of Object.entries(state.leftVoiceMap)) {
-            if (now - leftTime >= penaltyTime) {
-                // Remove do leftVoiceMap
-                delete state.leftVoiceMap[userId];
+        const guilds = db.getActiveGuilds();
+        for (const guildRow of guilds) {
+            const guildId = guildRow.guild_id;
+            await guildLocalStorage.run({ guildId }, async () => {
+                for (const [userId, leftTime] of Object.entries(state.leftVoiceMap)) {
+                    if (now - leftTime >= penaltyTime) {
+                        // Remove do leftVoiceMap
+                        delete state.leftVoiceMap[userId];
 
-                // Busca a reserva ativa dele
-                const claim = db.getClaimByPlayer(userId);
-                if (claim && claim.status === 'active') {
-                    console.log(`[Scheduler] Cancelando reserva de ${claim.player_name} (ID: ${userId}) no respawn ${claim.respawn_name} devido a penalidade de canal de voz.`);
-                    
-                    db.deleteClaim(claim.respawn_id);
+                        // Busca a reserva ativa dele
+                        const claim = db.getClaimByPlayer(userId);
+                        if (claim && claim.status === 'active') {
+                            console.log(`[Scheduler] Cancelando reserva de ${claim.player_name} (ID: ${userId}) no respawn ${claim.respawn_name} devido a penalidade de canal de voz.`);
+                            
+                            db.deleteClaim(claim.respawn_id);
 
-                    const cancelMsg = `❌ **Reserva Cancelada:** Sua reserva do respawn **${claim.respawn_name}** (\`${claim.respawn_id}\`) foi cancelada porque você ficou mais de 5 minutos fora de um canal de voz do Discord.`;
+                            const cancelMsg = `❌ **Reserva Cancelada:** Sua reserva do respawn **${claim.respawn_name}** (\`${claim.respawn_id}\`) foi cancelada porque você ficou mais de 5 minutos fora de um canal de voz do Discord.`;
 
-                    // Notificar via Discord DM
-                    try {
-                        const user = await client.users.fetch(userId);
-                        if (user) await user.send(cancelMsg);
-                    } catch (e) {
-                        console.warn(`[Scheduler] Erro ao enviar DM de cancelamento para ${userId}:`, e.message);
-                    }
+                            // Notificar via Discord DM
+                            try {
+                                const user = await client.users.fetch(userId);
+                                if (user) await user.send(cancelMsg);
+                            } catch (e) {
+                                console.warn(`[Scheduler] Erro ao enviar DM de cancelamento para ${userId}:`, e.message);
+                            }
 
-                    // Notificar via WhatsApp
-                    try {
-                        const reg = db.getRegisteredMember(userId);
-                        if (reg && reg.phone) {
-                            const whatsapp = require('./whatsapp');
-                            await whatsapp.sendWhatsAppMessage(reg.phone, cancelMsg);
+                            // Notificar via WhatsApp
+                            try {
+                                const reg = db.getRegisteredMember(userId);
+                                if (reg && reg.phone) {
+                                    const whatsapp = require('./whatsapp');
+                                    await whatsapp.sendWhatsAppMessage(reg.phone, cancelMsg);
+                                }
+                            } catch (e) {
+                                console.warn(`[Scheduler] Erro ao enviar WhatsApp de cancelamento para ${userId}:`, e.message);
+                            }
+
+                            // Promove o próximo da fila se houver
+                            await promoteNextInQueue(claim.respawn_id, claim.respawn_name, claim.category);
                         }
-                    } catch (e) {
-                        console.warn(`[Scheduler] Erro ao enviar WhatsApp de cancelamento para ${userId}:`, e.message);
                     }
-
-                    // Promove o próximo da fila se houver
-                    await promoteNextInQueue(claim.respawn_id, claim.respawn_name, claim.category);
                 }
-            }
+            });
         }
     } catch (err) {
         console.error('[Scheduler] checkVoiceChannelPenalties erro:', err.message);
