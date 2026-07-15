@@ -125,7 +125,7 @@ module.exports = {
                 `Para concluir o seu registro, você precisa verificar seu número de WhatsApp.\n\n` +
                 `🔔 O código de verificação foi enviado para: **+${cleanPhone}**${sendNote}\n\n` +
                 `🔗 *Se preferir, você também pode abrir a conversa com o bot manualmente:* ` +
-                `https://wa.me/5511926007896?text=codigo\n\n` +
+                `https://wa.me/5511993872282?text=codigo\n\n` +
                 `Após receber o código de 4 dígitos no WhatsApp, digite o comando **\`/confirmar-codigo codigo: <seu código>\`** aqui no Discord para concluir o seu cadastro.`
             )
             .setFooter({ text: 'O código expira em 5 minutos' });

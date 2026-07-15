@@ -236,7 +236,7 @@ async function handleRegisterModalSubmit(interaction, config) {
                 `Para concluir o seu registro, você precisa verificar seu número de WhatsApp.\n\n` +
                 `🔔 O código de verificação foi enviado para: **+${cleanPhone}**${sendNote}\n\n` +
                 `🔗 *Se preferir, você também pode abrir a conversa com o bot manualmente:* ` +
-                `https://wa.me/5511926007896?text=codigo\n\n` +
+                `https://wa.me/5511993872282?text=codigo\n\n` +
                 `Depois que o bot responder com o código no seu WhatsApp, clique no botão **Digitar Código** abaixo para concluir.`
             )
             .setFooter({ text: 'O código expira em 5 minutos' });
